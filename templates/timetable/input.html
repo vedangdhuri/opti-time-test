@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Generate Timetable{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-secondary text-white">
+        Timetable Settings
+      </div>
+
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Number of Days</label>
+            <input type="number" name="days" value="5"
+                   class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Slots Per Day</label>
+            <input type="number" name="slots" value="6"
+                   class="form-control" required>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-primary">
+              Generate Timetable
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

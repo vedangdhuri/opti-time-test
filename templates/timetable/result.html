@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Generated Timetable{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header bg-success text-white">
+    Generated Timetable
+  </div>
+
+  <div class="card-body">
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+            <th>Room</th>
+            <th>Day</th>
+            <th>Slot</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in timetable %}
+          <tr>
+            <td>{{ row.class.name }}</td>
+            <td>{{ row.subject.name }}</td>
+            <td>{{ row.subject.teacher.name }}</td>
+            <td>{{ row.room.name }}</td>
+            <td>{{ row.slot.day }}</td>
+            <td>{{ row.slot.slot }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-muted">
+              No timetable generated
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <a href="{% url 'ortools_app:timetable-input' %}"
+       class="btn btn-outline-primary mt-3">
+       Generate Again
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h3 class="mb-4">Overall Analytics Dashboard</h3>
+
+<!-- ===================== CARDS ===================== -->
+<div class="row g-3 mb-4">
+
+  <div class="col-md-3">
+    <div class="card text-bg-primary h-100">
+      <div class="card-body text-center">
+        <h6>Total Classes</h6>
+        <h2>{{ total_classes }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-bg-success h-100">
+      <div class="card-body text-center">
+        <h6>Total Subjects</h6>
+        <h2>{{ total_subjects }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-bg-warning h-100">
+      <div class="card-body text-center">
+        <h6>Total Rooms</h6>
+        <h2>{{ total_rooms }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-bg-info h-100">
+      <div class="card-body text-center">
+        <h6>Total Batches</h6>
+        <h2>{{ total_batches }}</h2>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TIMETABLE STATS ===================== -->
+<div class="row g-3 mb-4">
+
+  <div class="col-md-3">
+    <div class="card border-primary h-100">
+      <div class="card-body text-center">
+        <h6>Total Entries</h6>
+        <h2>{{ total_entries }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-success h-100">
+      <div class="card-body text-center">
+        <h6>Lectures</h6>
+        <h2>{{ total_lectures }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-info h-100">
+      <div class="card-body text-center">
+        <h6>Practicals</h6>
+        <h2>{{ total_practicals }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-warning h-100">
+      <div class="card-body text-center">
+        <h6>Breaks</h6>
+        <h2>{{ total_breaks }}</h2>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== DAY-WISE LOAD ===================== -->
+<div class="card">
+  <div class="card-header fw-bold">
+    Day-wise Timetable Load
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-bordered mb-0 text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Day</th>
+          <th>Total Sessions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for day in day_wise_load %}
+        <tr>
+          <td>{{ day.name }}</td>
+          <td>{{ day.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

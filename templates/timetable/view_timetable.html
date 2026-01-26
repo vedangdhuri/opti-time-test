@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load timetable_extras %}
+
+{% block title %}
+View Timetable
+{% endblock %}
+
+{% block content %}
+
+<h3 class="text-center mb-4">
+    Timetable – {{ academic_class.name }} ({{ academic_class.semester }})
+</h3>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped text-center align-middle">
+
+        <!-- TABLE HEADER -->
+        <thead class="table-dark">
+            <tr>
+                <th>Time</th>
+                {% for day in days %}
+                    <th>{{ day.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <!-- TABLE BODY -->
+        <tbody>
+            {% for slot, day_map in timetable.items %}
+            <tr>
+                <!-- Time Slot -->
+                <td class="fw-bold">
+                    {{ slot.start_time }} - {{ slot.end_time }}
+                </td>
+
+                <!-- Day-wise Entries -->
+                {% for day in days %}
+                    {% with entry=day_map|get_item:day %}
+                    <td>
+                        {% if entry %}
+                            {% if entry.is_break %}
+                                <span class="badge bg-warning text-dark">
+                                    BREAK
+                                </span>
+                            {% else %}
+                                <strong>{{ entry.subject.code }}</strong><br>
+                                <small class="text-muted">
+                                    {{ entry.room }}
+                                </small>
+                                {% if entry.batch %}
+                                    <br>
+                                    <span class="badge bg-info text-dark">
+                                        {{ entry.batch }}
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    {% endwith %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
