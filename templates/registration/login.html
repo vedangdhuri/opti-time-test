@@ -7,16 +7,19 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-sm rounded-4">
+            <div class="card shadow-lg rounded-4 border-0">
                 <div class="card-body p-5">
-                    <h2 class="text-center mb-4">Welcome Back</h2>
-                    <p class="text-center text-muted mb-4">Please sign in to your account</p>
+                    <div class="text-center mb-4">
+                        <img src="{% static 'images/college_logo.png' %}" alt="Logo" height="60" class="mb-3">
+                        <h2 class="fw-bold">Welcome Back</h2>
+                        <p class="text-muted">Please sign in to your account</p>
+                    </div>
 
                     <form method="post" novalidate>
                         {% csrf_token %}
                         {{ form|crispy }}
-                        <div class="d-grid gap-2 mt-3">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">Login</button>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">Login</button>
                         </div>
                     </form>
 
@@ -28,14 +31,14 @@
 
 
                     <div class="text-center mt-3">
-                        <a href="{% url 'password_reset' %}" class="text-decoration-none text-dark">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none text-muted small">
                             Forgot Password?
                         </a>
                     </div>
 
-                    <div class="text-center mt-4">
-                        <p class="mb-0">Don't have an account?</p>
-                        <a href="{% url 'signup' %}" class="btn btn-outline-primary rounded-pill mt-2">Create Account</a>
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="mb-1 text-muted">Don't have an account?</p>
+                        <a href="{% url 'signup' %}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Create Account</a>
                     </div>
                 </div>
             </div>
