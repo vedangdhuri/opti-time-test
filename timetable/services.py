@@ -43,21 +43,14 @@ def generate_timetable(academic_class_id):
     TimetableEntry.objects.filter(academic_class=academic_class).delete()
 
     # --- PHASE 1: PREPARE PRACTICAL TRIPLETS ---
-    # We want A1, A2, A3 to run simultaneously.
-    # Total sessions required per batch: 1+2+1+1+1 = 6 sessions.
-    # We need 6 Time Blocks of 2 hours.
-    
-    # Create a bucket of tasks for each batch
     batch_buckets = {b.name: [] for b in batches}
     for b in batches:
         for item in course_data:
             for _ in range(item["pr_sessions"]):
                 batch_buckets[b.name].append(subjects_map[item["code"]])
     
-    # Form blocks (Triplets of A1, A2, A3 subjects)
     practical_blocks = [] # List of {batch: subject} dicts
     
-    # Helper to shuffle
     for k in batch_buckets:
         random.shuffle(batch_buckets[k])
         
@@ -67,18 +60,14 @@ def generate_timetable(academic_class_id):
         block_assignment = {}
         used_subs = set()
         
-        # Try to construct a distinct triplet
         for b in batches:
             bucket = batch_buckets[b.name]
             chosen = None
-            
-            # Simple Greedy: First unused subject
             for sub in bucket:
                 if sub not in used_subs:
                     chosen = sub
                     break
             
-            # Fallback: Just take first avail (overlap allowed)
             if not chosen and bucket:
                 chosen = bucket[0]
             
@@ -96,7 +85,6 @@ def generate_timetable(academic_class_id):
         
     duration = 2
     
-    # Find candidates for 2-hour blocks
     block_candidates = []
     for d in days:
         for i in range(len(all_slots) - (duration - 1)):
@@ -106,18 +94,15 @@ def generate_timetable(academic_class_id):
             
     random.shuffle(block_candidates)
     
-    # Place blocks
     for assignment in practical_blocks:
         placed = False
         for i, (day, s_pair) in enumerate(block_candidates):
-            # Check collision (Whole class busy?)
             collision = False
             for s in s_pair:
                 if TimetableEntry.objects.filter(academic_class=academic_class, day=day, time_slot=s).exists():
                     collision = True; break
             
             if not collision:
-                # Place for all batches
                 for batch, sub in assignment.items():
                     r = random.choice(rooms) 
                     for s in s_pair:
@@ -129,8 +114,6 @@ def generate_timetable(academic_class_id):
                             room=r,
                             batch=batch
                         )
-                
-                # Remove this candidate so we don't double book
                 block_candidates.pop(i)
                 placed = True
                 break
@@ -142,7 +125,6 @@ def generate_timetable(academic_class_id):
             theory_tasks.append(subjects_map[item["code"]])
     random.shuffle(theory_tasks)
     
-    # Place theory in remaining single slots
     single_candidates = []
     for d in days:
         for s in all_slots:
@@ -154,8 +136,6 @@ def generate_timetable(academic_class_id):
         placed = False
         for day, slot in single_candidates:
             if placed: break
-            
-            # Check occupied
             if TimetableEntry.objects.filter(academic_class=academic_class, day=day, time_slot=slot).exists():
                 continue
                 
@@ -166,7 +146,7 @@ def generate_timetable(academic_class_id):
                 time_slot=slot,
                 subject=sub,
                 room=r,
-                batch=None # Theory
+                batch=None
             )
             placed = True
 
@@ -182,23 +162,24 @@ def generate_timetable(academic_class_id):
                         is_break=True
                      )
 
-    # --- PHASE 5: FILL GAPS (LIBRARY) ---
-    # User requested "no slot to be empty".
-    # We will create a generic "LIB" subject for gaps.
-    lib_subject, _ = Subject.objects.get_or_create(code="LIB", defaults={"name": "Library", "subject_type": "THEORY"})
+    # --- PHASE 5: FILL GAPS WITH EXTRA LECTURES ---
+    available_subjects = list(subjects_map.values())
     
     for day in days:
         for slot in all_slots:
-            # If nothing exists here (no break, no theory, no practical)
+            if is_break(slot): continue
+            
             if not TimetableEntry.objects.filter(academic_class=academic_class, day=day, time_slot=slot).exists():
-                 # Create Library entry
-                 # Use a generic room or first available
-                 r = rooms[0]
-                 TimetableEntry.objects.create(
-                    academic_class=academic_class,
-                    day=day,
-                    time_slot=slot,
-                    subject=lib_subject,
-                    room=r,
-                    batch=None
-                 )
+                 if available_subjects:
+                     sub = random.choice(available_subjects)
+                     r = rooms[0]
+                     
+                     TimetableEntry.objects.create(
+                        academic_class=academic_class,
+                        day=day,
+                        time_slot=slot,
+                        subject=sub,
+                        room=r,
+                        batch=None, 
+                        is_extra=True # Mark as extra
+                     )

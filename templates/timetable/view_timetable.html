@@ -77,7 +77,8 @@
                                                             <!-- Single Entry (Theory) -->
                                                             {% with entry=cell.entries.0 %}
                                                                 <div class="subject-code">{{ entry.subject.code }} 
-                                                                    {% if entry.subject.code != "LIB" %}
+                                                                    {% if entry.is_extra %} - E
+                                                                    {% elif entry.subject.code != "LIB" %}
                                                                     - {{ entry.subject.subject_type|slice:":1" }}
                                                                     {% endif %}
                                                                 </div>

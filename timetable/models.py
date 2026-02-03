@@ -69,6 +69,7 @@ class TimetableEntry(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.SET_NULL, null=True, blank=True)
 
     is_break = models.BooleanField(default=False)  # Lunch / Tea Break
+    is_extra = models.BooleanField(default=False)  # Extra Lecture for filling gaps
 
     def __str__(self):
         return f"{self.day} | {self.time_slot}"
