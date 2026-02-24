@@ -8,36 +8,36 @@ sys.path.append(os.getcwd())
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup()
 
-from class_timetable.models import TycoBInput
+from class_timetable.models import TycoInput
 
 def populate():
-    print("Clearing TYCO B inputs...")
-    TycoBInput.objects.all().delete()
+    print("Clearing TYCO inputs...")
+    TycoInput.objects.all().delete()
     
     data = [
         {
             "subject": "OPERATING SYSTEM",
-            "teacher": "Mr. S. M. Mayekar",
+            "teacher": "Mr.J.A.Gawade",
             "th": 5,
             "pr": 2
         },
         {
             "subject": "SOFTWARE ENGINEERING",
-            "teacher": "Mrs. P. B. Mhadgut",
+            "teacher": "Mr.A.S.Padwal",
             "th": 4,
             "pr": 4
         },
         {
             "subject": "ENTREPRENEURSHIP DEVELOPMENT AND STARTUPS",
-            "teacher": "Mrs. T. V. Gawandi",
+            "teacher": "Mrs.S.A.Palav",
             "th": 1,
             "pr": 2
         },
         {
             "subject": "SEMINAR AND PROJECT INITIATION COURSE",
-            "teacher": "Mr. T. C. Mhapankar",
+            "teacher": "Mr.P.D.kate",
             "th": 0,
-            "pr": 2 # Assuming 2 credits for 1 block
+            "pr": 2 # Adjusted from 1 to 2 to ensure it gets a block
         },
         {
             "subject": "CLOUD COMPUTING",
@@ -48,7 +48,7 @@ def populate():
     ]
     
     for d in data:
-        TycoBInput.objects.create(
+        TycoInput.objects.create(
             subject_name=d["subject"],
             teacher_name=d["teacher"],
             theory_credits=d["th"],
@@ -56,7 +56,7 @@ def populate():
         )
         print(f"Added {d['subject']}")
 
-    print("Success! TYCO B inputs populated.")
+    print("Success! TYCO inputs populated.")
 
 if __name__ == '__main__':
     populate()

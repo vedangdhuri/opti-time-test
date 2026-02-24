@@ -43,30 +43,23 @@ class ClassTimetableBase(models.Model):
     def __str__(self):
         return f"{self.day} {self.start_time}-{self.end_time}: {self.subject_name} ({self.batch})"
 
-# --- TYCO A ---
-class TycoAInput(ClassInputBase):
+# --- TYCO ---
+class TycoInput(ClassInputBase):
     pass
 
-class TycoATimetable(ClassTimetableBase):
+class TycoTimetable(ClassTimetableBase):
     pass
 
-# --- TYCO B ---
-class TycoBInput(ClassInputBase):
+# --- SYCO ---
+class SycoInput(ClassInputBase):
     pass
 
-class TycoBTimetable(ClassTimetableBase):
+class SycoTimetable(ClassTimetableBase):
     pass
 
-# --- SYCO A ---
-class SycoAInput(ClassInputBase):
+# --- FYCO ---
+class FycoInput(ClassInputBase):
     pass
 
-class SycoATimetable(ClassTimetableBase):
-    pass
-
-# --- SYCO B ---
-class SycoBInput(ClassInputBase):
-    pass
-
-class SycoBTimetable(ClassTimetableBase):
+class FycoTimetable(ClassTimetableBase):
     pass

@@ -50,8 +50,7 @@
                                     {% if val.theory_balanced %}Balanced{% else %}Unbalanced{% endif %}
                                 </h2>
                                 {% if val.total_theory_deficit > 0 %}
-                                <span class="badge bg-danger rounded-pill">Deficit: {{ val.total_theory_deficit
-                                    }}</span>
+                                <span class="badge bg-danger rounded-pill">Deficit: {{ val.total_theory_deficit }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -67,8 +66,7 @@
                                     {% if val.practical_balanced %}Balanced{% else %}Unbalanced{% endif %}
                                 </h2>
                                 {% if val.total_practical_deficit > 0 %}
-                                <span class="badge bg-danger rounded-pill">Deficit: {{ val.total_practical_deficit
-                                    }}</span>
+                                <span class="badge bg-danger rounded-pill">Deficit: {{ val.total_practical_deficit }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -169,8 +167,7 @@
                                         {% for p_dist in val.practical_distribution %}
                                         <tr>
                                             <td>{{ p_dist.subject }}</td>
-                                            <td class="text-center"><span class="badge bg-dark">{{ p_dist.batch
-                                                    }}</span></td>
+                                            <td class="text-center"><span class="badge bg-dark">{{ p_dist.batch }}</span></td>
                                             <td class="text-center">{{ p_dist.expected_blocks }}</td>
                                             <td
                                                 class="text-center fw-bold {% if p_dist.actual_blocks < p_dist.expected_blocks %}text-danger{% elif p_dist.actual_blocks > p_dist.expected_blocks %}text-warning{% else %}text-success{% endif %}">

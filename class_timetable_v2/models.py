@@ -45,26 +45,20 @@ class ClassTimetableBase(models.Model):
 # Using distinct names to avoid collision if necessary, but since they are in a different app, 
 # Django names them 'class_timetable_v2_tycoainput' etc.
 
-class TycoAInput(ClassInputBase):
+class TycoInput(ClassInputBase):
     pass
 
-class TycoATimetable(ClassTimetableBase):
+class TycoTimetable(ClassTimetableBase):
     pass
 
-class TycoBInput(ClassInputBase):
+class SycoInput(ClassInputBase):
     pass
 
-class TycoBTimetable(ClassTimetableBase):
+class SycoTimetable(ClassTimetableBase):
     pass
 
-class SycoAInput(ClassInputBase):
+class FycoInput(ClassInputBase):
     pass
 
-class SycoATimetable(ClassTimetableBase):
-    pass
-
-class SycoBInput(ClassInputBase):
-    pass
-
-class SycoBTimetable(ClassTimetableBase):
+class FycoTimetable(ClassTimetableBase):
     pass

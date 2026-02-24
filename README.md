@@ -22,7 +22,7 @@
 
 **Opti-Time** is a powerful Django-based application engineered to solve the NP-hard problem of university timetabling. It automates the complex process of scheduling classes, practical batches, and teacher assignments while strictly adhering to hard constraints and optimizing for soft constraints.
 
-It handles multiple classes (e.g., SYCO A/B, TYCO A/B), subject constraints, practical batches (A1, A2, A3), and teacher availability to produce **conflict-free, optimized schedules**.
+It handles multiple classes (e.g., FYCO, SYCO, TYCO), subject constraints, practical batches (A1, A2, A3), and teacher availability to produce **conflict-free, optimized schedules**.
 
 ---
 
@@ -71,7 +71,7 @@ The core of **Opti-Time** operates on a **Constrained-Based Randomized Heuristic
 1.  **🧬 Phase 1: Practical Scheduling (Hard Constraint)**
     - Uses `itertools.product` to generate valid combinations of practical subjects for batches (A1, A2, A3).
     - **Constraint**: All three teachers in a combined practical slot _must_ be unique.
-    - **Cross-Check**: Verifies teacher availability against other classes (e.g., Is the teacher busy in TYCO-A while needed for SYCO-B?).
+    - **Cross-Check**: Verifies teacher availability against other classes (e.g., Is the teacher busy in TYCO while needed for SYCO?).
 
 2.  **🕗 Phase 2: Theory Scheduling**
     - Iterates through available time slots.
@@ -133,10 +133,8 @@ Get the project running locally in just a few steps.
     _Populate the database with initial data for testing:_
 
     ```bash
-    python populate_syco_a_real.py
-    python populate_syco_b_real.py
-    python populate_tyco_a_real.py
-    python populate_tyco_b_real.py
+    python populate_syco_real.py
+    python populate_tyco_real.py
     ```
 
 6.  **Run the Server**
@@ -181,4 +179,3 @@ Contributions are what make the open source community such an amazing place to l
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-
