@@ -34,7 +34,9 @@ It handles multiple classes (e.g., FYCO, SYCO, TYCO), subject constraints, pract
 | **⚡ Conflict Detection**   | Real-time validation ensures no teacher or room is double-booked across different classes.                         |
 | **🧪 Batch Management**     | Automatically handles practical sessions for distinct batches (A1, A2, A3) ensuring unique teacher assignments.    |
 | **⚖️ Smart Allocation**     | Prioritizes practicals (2hr blocks), distributes theory lectures evenly (Max 2/day), and fills gaps intelligently. |
-| **📊 Analytics Dashboard**  | Visualizes workload distribution to identify underloaded or overloaded resources.                                  |
+| **📈 Global Analytics**     | Dedicated institutional-level dashboards to holistically view overall validations, workload, and conflicts.        |
+| **📊 Class Dashboard**      | Visualizes per-class workload distribution to identify underloaded or overloaded resources.                        |
+| **🔄 Dynamic Regeneration** | Seamlessly regenerate the timetable with a single click to explore and refine scheduling alternatives.             |
 | **📥 Export Ready**         | Download generated timetables in professional **PDF**, **Excel**, and **PNG** formats.                             |
 | **🌱 Data Seeding**         | Includes scripts to populate initial sample data for robust testing and demonstration.                             |
 
@@ -48,7 +50,9 @@ This project uses a modern, robust technology stack:
 
 - ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) **Python 3.11+** - The core programming language.
 - ![Django](https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white) **Django** - The high-level web framework.
-- ![SQLite](https://img.shields.io/badge/SQLite-07405e?style=flat-square&logo=sqlite&logoColor=white) **SQLite** - Lightweight relational database (default).
+- ![SQLite](https://img.shields.io/badge/SQLite-07405e?style=flat-square&logo=sqlite&logoColor=white) **SQLite** - Local development database.
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white) **PostgreSQL** - Production-ready database support via `dj_database_url`.
+- ![WhiteNoise](https://img.shields.io/badge/WhiteNoise-000000?style=flat-square&logo=python&logoColor=white) **WhiteNoise** - For efficient static file serving in production.
 
 ### Frontend
 
@@ -133,6 +137,7 @@ Get the project running locally in just a few steps.
     _Populate the database with initial data for testing:_
 
     ```bash
+    python populate_fyco_real.py
     python populate_syco_real.py
     python populate_tyco_real.py
     ```
