@@ -15,7 +15,7 @@
 
 <!-- Padding to prevent footer overlap -->
 
-<body class="bg-light pb-5">
+<body class="bg-light d-flex flex-column min-vh-100">
 
   <!-- ===================== NAVBAR ===================== -->
   <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -23,7 +23,7 @@
 
       <!-- Logo + Institute Name -->
       <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-        <img src="{% static 'images/college_logo.png' %}" alt="College Logo" height="50">
+        <img src="{% static 'images/college_logo.png' %}" alt="College Logo" height="60">
         <div class="d-none d-md-block lh-1">
           <span class="d-block text-dark fw-bold" style="font-size: 1.1rem;">
             Opti-Time
@@ -50,16 +50,21 @@
           </li>
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link px-3" href="{% url 'dashboard' %}">
-              Dashboard
+            <a class="nav-link px-3" href="{% url 'class_timetable:dashboard' %}">
+              Class-wise Timetable
             </a>
           </li>
-
-          <!-- Class-wise Timetable Link -->
           <li class="nav-item">
-            <a class="nav-link px-3" href="{% url 'class_timetable:dashboard' %}">
-              Class-wise System
+            <a class="nav-link px-3" href="{% url 'class_timetable:overall_analytics' %}">
+              Overall Analytics
             </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3" href="{% url 'class_timetable:overall_validation' %}">
+              Overall Validation
+            </a>
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link px-3" href="{% url 'about' %}">
               About
@@ -151,8 +156,12 @@
               class="btn btn-light text-primary px-4 py-2 fw-bold shadow-sm">
               View Timetable
             </a>
-            <a href="{% url 'dashboard' %}" class="btn btn-outline-light px-4 py-2 fw-semibold">
-              View Analytics
+            <a href="{% url 'class_timetable:overall_analytics' %}" class="btn btn-outline-light px-4 py-2 fw-semibold">
+              Overall Analytics
+            </a>
+            <a href="{% url 'class_timetable:overall_validation' %}"
+              class="btn btn-outline-light px-4 py-2 fw-semibold">
+              Overall Validation
             </a>
           </div>
         </div>

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .utils import CLASS_CONFIG, generate_timetable_for_class, ACADEMIC_SLOTS
-from .forms import TycoAInputForm, TycoBInputForm, SycoAInputForm, SycoBInputForm
+from .forms import TycoInputForm, SycoInputForm, FycoInputForm
 from datetime import time
 
 def dashboard(request):
@@ -17,10 +17,9 @@ def input_data(request, class_key):
     InputModel = cfg['input']
     
     form_map = {
-        'tyco_a': TycoAInputForm,
-        'tyco_b': TycoBInputForm,
-        'syco_a': SycoAInputForm,
-        'syco_b': SycoBInputForm,
+        'tyco': TycoInputForm,
+        'syco': SycoInputForm,
+        'fyco': FycoInputForm,
     }
     FormClass = form_map.get(class_key)
     

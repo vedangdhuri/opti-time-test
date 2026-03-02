@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .utils import CLASS_CONFIG, generate_timetable_for_class, ACADEMIC_SLOTS
-from .forms import TycoAInputForm, TycoBInputForm, SycoAInputForm, SycoBInputForm
+from .utils import CLASS_CONFIG, generate_timetable_for_class, ACADEMIC_SLOTS, analyze_timetable, validate_workload_distribution
+from .forms import TycoInputForm, SycoInputForm, FycoInputForm
 from datetime import time
 
 def dashboard(request):
@@ -17,10 +17,9 @@ def input_data(request, class_key):
     InputModel = cfg['input']
     
     form_map = {
-        'tyco_a': TycoAInputForm,
-        'tyco_b': TycoBInputForm,
-        'syco_a': SycoAInputForm,
-        'syco_b': SycoBInputForm,
+        'tyco': TycoInputForm,
+        'syco': SycoInputForm,
+        'fyco': FycoInputForm,
     }
     FormClass = form_map.get(class_key)
     
@@ -65,6 +64,52 @@ def generate_timetable_view(request, class_key):
         messages.error(request, f"Error: {msg}")
         
     return redirect('class_timetable:view_timetable', class_key=class_key)
+
+def validate_workload_view(request, class_key):
+    if class_key not in CLASS_CONFIG:
+        return redirect('class_timetable:dashboard')
+    
+    cfg = CLASS_CONFIG[class_key]
+    validation = validate_workload_distribution(class_key)
+    
+    return render(request, 'class_timetable/validation.html', {
+        'class_name': cfg['name'],
+        'class_key': class_key,
+        'validation': validation
+    })
+
+def overall_analytics_view(request):
+    results = {}
+    for class_key in CLASS_CONFIG:
+        # Check if timetable has entries? Or just run analysis
+        # analysis handles empty timetable gracefully (counts 0)
+        results[class_key] = analyze_timetable(class_key)
+        results[class_key]['name'] = CLASS_CONFIG[class_key]['name']
+        results[class_key]['class_key'] = class_key
+    
+    return render(request, 'class_timetable/overall_analytics.html', {'results': results})
+
+def overall_validation_view(request):
+    results = {}
+    for class_key in CLASS_CONFIG:
+        results[class_key] = validate_workload_distribution(class_key)
+        results[class_key]['name'] = CLASS_CONFIG[class_key]['name']
+        results[class_key]['class_key'] = class_key
+        
+    return render(request, 'class_timetable/overall_validation.html', {'results': results})
+
+def analytics_view(request, class_key):
+    if class_key not in CLASS_CONFIG:
+        return redirect('class_timetable:dashboard')
+    
+    cfg = CLASS_CONFIG[class_key]
+    analysis = analyze_timetable(class_key)
+    
+    return render(request, 'class_timetable/analytics.html', {
+        'class_name': cfg['name'],
+        'class_key': class_key,
+        'analysis': analysis
+    })
 
 def view_timetable(request, class_key):
     if class_key not in CLASS_CONFIG:

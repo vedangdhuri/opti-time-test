@@ -8,11 +8,11 @@ sys.path.append(os.getcwd())
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup()
 
-from class_timetable.models import SycoBInput
+from class_timetable.models import SycoInput
 
 def populate():
-    print("Clearing SYCO B inputs...")
-    SycoBInput.objects.all().delete()
+    print("Clearing SYCO inputs...")
+    SycoInput.objects.all().delete()
     
     data = [
         {
@@ -35,7 +35,7 @@ def populate():
         },
         {
             "subject": "Object Oriented Programming Using C++",
-            "teacher": "Mr.S.M.Mayekar", 
+            "teacher": "Mr.S.M.Mayekar", # Handling multiple teachers is complex, simplifying to main for now
             "th": 3,
             "pr": 4
         },
@@ -54,7 +54,7 @@ def populate():
     ]
     
     for d in data:
-        SycoBInput.objects.create(
+        SycoInput.objects.create(
             subject_name=d["subject"],
             teacher_name=d["teacher"],
             theory_credits=d["th"],
@@ -62,7 +62,8 @@ def populate():
         )
         print(f"Added {d['subject']}")
 
-    print("Success! SYCO B inputs populated.")
+    print("Success! SYCO inputs populated.")
 
 if __name__ == '__main__':
     populate()
+

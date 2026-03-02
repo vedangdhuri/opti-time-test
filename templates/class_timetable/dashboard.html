@@ -5,7 +5,7 @@
 <div class="row mb-4">
     <div class="col-12 text-center">
         <h2 class="display-5 fw-bold text-primary">Class-wise Timetable System</h2>
-        <p class="text-muted">Manage specific timetables for TYCO and SYCO classes.</p>
+        <p class="text-muted">Manage specific timetables for TYCO, SYCO, and FYCO classes.</p>
     </div>
 </div>
 
@@ -20,7 +20,7 @@
 </div>
 {% endif %}
 
-<div class="row g-4">
+<div class="row g-4 justify-content-center">
     {% for class_key, cfg in class_config.items %}
     <div class="col-md-6 col-lg-3">
         <div class="card h-100 shadow border-0 hover-card">
@@ -40,6 +40,15 @@
 
                     <a href="{% url 'class_timetable:view_timetable' class_key %}" class="btn btn-success shadow-sm">
                         <i class="bi bi-table"></i> View
+                    </a>
+
+                    <a href="{% url 'class_timetable:analytics' class_key %}" class="btn btn-info text-white shadow-sm">
+                        <i class="bi bi-graph-up-arrow"></i> Analytics
+                    </a>
+
+                    <a href="{% url 'class_timetable:validation' class_key %}"
+                        class="btn btn-warning text-dark shadow-sm fw-bold">
+                        <i class="bi bi-clipboard-check"></i> Validation
                     </a>
 
                     <a href="{% url 'class_timetable:delete_timetable' class_key %}" class="btn btn-danger shadow-sm"

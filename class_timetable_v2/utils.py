@@ -2,10 +2,9 @@ import random
 import itertools
 from datetime import time, datetime, timedelta
 from .models import (
-    TycoAInput, TycoATimetable,
-    TycoBInput, TycoBTimetable,
-    SycoAInput, SycoATimetable,
-    SycoBInput, SycoBTimetable,
+    TycoInput, TycoTimetable,
+    SycoInput, SycoTimetable,
+    FycoInput, FycoTimetable,
     DAYS
 )
 
@@ -35,10 +34,9 @@ ACADEMIC_SLOTS = [
 ]
 
 CLASS_CONFIG = {
-    'tyco_a': {'input': TycoAInput, 'timetable': TycoATimetable, 'name': 'TYCO A'},
-    'tyco_b': {'input': TycoBInput, 'timetable': TycoBTimetable, 'name': 'TYCO B'},
-    'syco_a': {'input': SycoAInput, 'timetable': SycoATimetable, 'name': 'SYCO A'},
-    'syco_b': {'input': SycoBInput, 'timetable': SycoBTimetable, 'name': 'SYCO B'},
+    'tyco': {'input': TycoInput, 'timetable': TycoTimetable, 'name': 'TYCO'},
+    'syco': {'input': SycoInput, 'timetable': SycoTimetable, 'name': 'SYCO'},
+    'fyco': {'input': FycoInput, 'timetable': FycoTimetable, 'name': 'FYCO'},
 }
 
 def check_teacher_conflict_bulk(teacher_list, day, start_time, exclude_class_key):
@@ -112,159 +110,163 @@ def generate_timetable_for_class(class_key):
     # Grid Initialization: (Day, SlotIndex) -> Entry
     grid = {} 
     
-    # --- STEP A: SCHEDULE PRACTICALS ---
-    # Create per-batch pools for practicals
-    # Each item is the Input Object itself. Blocks needed = practical_credits // 2
-    lab_pools = {'A1': [], 'A2': [], 'A3': []}
+    run_order = ['PR', 'TH'] if class_key == 'fyco' else ['TH', 'PR']
+    for current_phase in run_order:
+        if current_phase == 'PR':
+            # --- STEP A: SCHEDULE PRACTICALS ---
+            # Create per-batch pools for practicals
+            # Each item is the Input Object itself. Blocks needed = practical_credits // 2
+            lab_pools = {'A1': [], 'A2': [], 'A3': []}
     
-    for inp in all_inputs:
-        blocks = inp.practical_credits // 2
-        for _ in range(blocks):
-            for batch in ['A1', 'A2', 'A3']:
-                lab_pools[batch].append(inp) # Add input object reference
+            for inp in all_inputs:
+                blocks = inp.practical_credits // 2
+                for _ in range(blocks):
+                    for batch in ['A1', 'A2', 'A3']:
+                        lab_pools[batch].append(inp) # Add input object reference
                 
-    # Shuffle pools initially
-    for b in lab_pools:
-        random.shuffle(lab_pools[b])
+            # Shuffle pools initially
+            for b in lab_pools:
+                random.shuffle(lab_pools[b])
 
-    # We need to fill at most 1 PR block per day (Mon-Sat = 6 blocks total)
-    # Total requirements should be ~6 per batch.
+            # We need to fill at most 1 PR block per day (Mon-Sat = 6 blocks total)
+            # Total requirements should be ~6 per batch.
     
-    # Iterate through days
-    # Try different start slots per day to vary time?
-    # Standard: Start 0, 2, 4.
+            # Iterate through days
+            # Try different start slots per day to vary time?
+            # Standard: Start 0, 2, 4.
     
-    # Sort inputs by practical credits initially to load heavy items first?
-    # Actually just shuffle, we want to solve fully.
+            # Sort inputs by practical credits initially to load heavy items first?
+            # Actually just shuffle, we want to solve fully.
     
-    for day in days_list:
-        possible_starts = [0, 2, 4]
-        random.shuffle(possible_starts)
+            for day in days_list:
+                possible_starts = [0, 2, 4]
+                random.shuffle(possible_starts)
         
-        placed_pr = False
+                placed_pr = False
         
-        for start_slot in possible_starts:
-            s1 = start_slot
-            s2 = start_slot + 1
-            if (day, s1) in grid or (day, s2) in grid:
-                continue
+                for start_slot in possible_starts:
+                    s1 = start_slot
+                    s2 = start_slot + 1
+                    if (day, s1) in grid or (day, s2) in grid:
+                        continue
 
-            # Check if pools are empty
-            if not lab_pools['A1'] or not lab_pools['A2'] or not lab_pools['A3']:
-                break
+                    # Check if pools are empty
+                    if not lab_pools['A1'] or not lab_pools['A2'] or not lab_pools['A3']:
+                        break
                 
-            # Create all valid combinations from available pools
-            # Use smaller sample if pools are huge, but likely < 10 items.
-            # itertools.product generates tuples (poolA1_item, poolA2_item, poolA3_item)
+                    # Create all valid combinations from available pools
+                    # Use smaller sample if pools are huge, but likely < 10 items.
+                    # itertools.product generates tuples (poolA1_item, poolA2_item, poolA3_item)
             
-            # Optimization: To avoid huge product if pools grow, cap at 200 via islice?
-            # Or just shuffle the product list.
+                    # Optimization: To avoid huge product if pools grow, cap at 200 via islice?
+                    # Or just shuffle the product list.
             
-            p1 = lab_pools['A1']
-            p2 = lab_pools['A2']
-            p3 = lab_pools['A3']
+                    p1 = lab_pools['A1']
+                    p2 = lab_pools['A2']
+                    p3 = lab_pools['A3']
             
-            # Generate all combinations
-            # Start generator
-            gen = itertools.product(p1, p2, p3)
+                    # Generate all combinations
+                    # Start generator
+                    gen = itertools.product(p1, p2, p3)
             
-            # To randomize, we can convert to list. Safe for small N.
-            candidates = list(gen)
-            random.shuffle(candidates)
+                    # To randomize, we can convert to list. Safe for small N.
+                    candidates = list(gen)
+                    random.shuffle(candidates)
             
-            found_trio = None
+                    found_trio = None
             
-            for tri_tuple in candidates:
-                c1, c2, c3 = tri_tuple
+                    for tri_tuple in candidates:
+                        c1, c2, c3 = tri_tuple
                 
-                # 1. Unique Teachers Check
-                teachers = {c1.teacher_name, c2.teacher_name, c3.teacher_name}
-                if len(teachers) < 3:
-                    continue
+                        # 1. Unique Teachers Check
+                        teachers = {c1.teacher_name, c2.teacher_name, c3.teacher_name}
+                        if len(teachers) < 3:
+                            continue
                     
-                # 2. Conflict Check (External Timetables)
-                # Check for both hours
-                if check_teacher_conflict_bulk(list(teachers), day, ACADEMIC_SLOTS[s1][0], class_key): continue
-                if check_teacher_conflict_bulk(list(teachers), day, ACADEMIC_SLOTS[s2][0], class_key): continue
+                        # 2. Conflict Check (External Timetables)
+                        # Check for both hours
+                        if check_teacher_conflict_bulk(list(teachers), day, ACADEMIC_SLOTS[s1][0], class_key): continue
+                        if check_teacher_conflict_bulk(list(teachers), day, ACADEMIC_SLOTS[s2][0], class_key): continue
                 
-                # Found valid!
-                found_trio = [c1, c2, c3]
-                break
+                        # Found valid!
+                        found_trio = [c1, c2, c3]
+                        break
             
-            if found_trio:
-                # Place
-                grid[(day, s1)] = {'type': 'PR', 'trio': found_trio, 'batches': ['A1', 'A2', 'A3']}
-                grid[(day, s2)] = {'type': 'PR', 'trio': found_trio, 'batches': ['A1', 'A2', 'A3']}
+                    if found_trio:
+                        # Place
+                        grid[(day, s1)] = {'type': 'PR', 'trio': found_trio, 'batches': ['A1', 'A2', 'A3']}
+                        grid[(day, s2)] = {'type': 'PR', 'trio': found_trio, 'batches': ['A1', 'A2', 'A3']}
                 
-                # Remove from pools
-                # Remove FIRST instance of object found in pool list
-                lab_pools['A1'].remove(found_trio[0])
-                lab_pools['A2'].remove(found_trio[1])
-                lab_pools['A3'].remove(found_trio[2])
+                        # Remove from pools
+                        # Remove FIRST instance of object found in pool list
+                        lab_pools['A1'].remove(found_trio[0])
+                        lab_pools['A2'].remove(found_trio[1])
+                        lab_pools['A3'].remove(found_trio[2])
                 
-                placed_pr = True
-                break
+                        placed_pr = True
+                        break
         
-        # Limit 1 PR block per day
-        if placed_pr:
-            continue 
+                # Limit 1 PR block per day
+                if placed_pr:
+                    continue 
             
-    # --- STEP B: SCHEDULE THEORY ---
-    # Improve standard shuffle with daily limits
+        elif current_phase == 'TH':
+            # --- STEP B: SCHEDULE THEORY ---
+            # Improve standard shuffle with daily limits
     
-    # Track daily counts: (day, subject_id) -> count
-    subject_daily_counts = {} 
+            # Track daily counts: (day, subject_id) -> count
+            subject_daily_counts = {} 
     
-    for day in days_list:
-        available_slots = [i for i in range(len(ACADEMIC_SLOTS)) if (day, i) not in grid]
+            for day in days_list:
+                available_slots = [i for i in range(len(ACADEMIC_SLOTS)) if (day, i) not in grid]
         
-        # Sort slots: Fill morning/afternoon evenly? Random is fine.
-        random.shuffle(available_slots)
+                # Sort slots: Fill morning/afternoon evenly? Random is fine.
+                random.shuffle(available_slots)
         
-        for slot_idx in available_slots:
-            if not theory_pool: break
+                for slot_idx in available_slots:
+                    if not theory_pool: break
             
-            # Try to find a valid subject for this slot
-            placed_t = None
+                    # Try to find a valid subject for this slot
+                    placed_t = None
             
-            # Iterate through pool to find best candidate
-            # Prioritize subjects that haven't been taught today
+                    # Iterate through pool to find best candidate
+                    # Prioritize subjects that haven't been taught today
             
-            # Snapshot of pool to iterate safely
-            # We want to pick `i` such that we can pop it.
+                    # Snapshot of pool to iterate safely
+                    # We want to pick `i` such that we can pop it.
             
-            candidates_indices = list(range(len(theory_pool)))
-            random.shuffle(candidates_indices)
+                    candidates_indices = list(range(len(theory_pool)))
+                    random.shuffle(candidates_indices)
             
-            for i in candidates_indices:
-                candidate = theory_pool[i]
-                start_time = ACADEMIC_SLOTS[slot_idx][0]
+                    for i in candidates_indices:
+                        candidate = theory_pool[i]
+                        start_time = ACADEMIC_SLOTS[slot_idx][0]
                 
-                # 1. Conflict Check
-                if check_single_conflict(candidate.teacher_name, day, start_time, class_key):
-                    continue
+                        # 1. Conflict Check
+                        if check_single_conflict(candidate.teacher_name, day, start_time, class_key):
+                            continue
                     
-                # 2. Daily Limit Check (Max 2 per day)
-                # Key for subject? ID or Name.
-                s_key = (day, candidate.id)
-                current_count = subject_daily_counts.get(s_key, 0)
-                if current_count >= 2:
-                    continue
+                        # 2. Daily Limit Check (Max 2 per day)
+                        # Key for subject? ID or Name.
+                        s_key = (day, candidate.id)
+                        current_count = subject_daily_counts.get(s_key, 0)
+                        if current_count >= 2:
+                            continue
                 
-                # Found valid
-                placed_t = candidate
-                theory_pool.pop(i) # Remove from pool
+                        # Found valid
+                        placed_t = candidate
+                        theory_pool.pop(i) # Remove from pool
                 
-                # Update counters
-                subject_daily_counts[s_key] = current_count + 1
-                break
+                        # Update counters
+                        subject_daily_counts[s_key] = current_count + 1
+                        break
             
-            if placed_t:
-                grid[(day, slot_idx)] = {'type': 'TH', 'subject': placed_t, 'batch': 'ALL'}
-            else:
-                 # Could not fill slot with current pool (conflicts or limits)
-                 # Leave empty for Extra lecture
-                 pass
+                    if placed_t:
+                        grid[(day, slot_idx)] = {'type': 'TH', 'subject': placed_t, 'batch': 'ALL'}
+                    else:
+                         # Could not fill slot with current pool (conflicts or limits)
+                         # Leave empty for Extra lecture
+                         pass
                 
     # --- STEP C: FILL GAPS WITH EXTRA LECTURES ---
     # Collect all theor subjects to pick from for extras
@@ -294,7 +296,16 @@ def generate_timetable_for_class(class_key):
         "Digital Techniques": "DTE",
         "Object Oriented Programming Using C++": "OOP",
         "Computer Graphics": "CGR",
-        "Essence Of Indian Constitution": "EIC"
+        "Essence Of Indian Constitution": "EIC",
+        # FYCO (Sem I)
+        "Basic Mathematics": "BMS",
+        "Basic Science (Physics)": "PHY",
+        "Basic Science (Chemistry)": "CHY",
+        "Communication Skills": "ENG",
+        "Engineering Graphics": "EGP",
+        "Professional Communication": "POC",
+        "Engineering Workshop Practice": "WPC",
+        "Fundamentals of ICT": "ICT"
     }
     
     def get_abbr(name):

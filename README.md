@@ -1,67 +1,186 @@
-### Planner Response
+<div align="center">
 
-The project is a **Timetable Management System** built with **Django**. It appears to have two parallel modules for handling timetables: a general [timetable](cci:1://file:///d:/PROGRAMMING/Main/made_with_anti/timetable/views.py:8:0-95:68) app and a more specialized `class_timetable` app (which seems to be the active focus for recent features like parallel practical sessions).
+# 🗓️ Opti-Time: Automated Class Timetable Generator
 
-Here is the workflow of the project, focusing on the core `class_timetable` generation logic:
+[![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-Framework-092E20?style=flat-square&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![GitHub issues](https://img.shields.io/github/issues/vedangdhuri/Opti-Time-69?style=flat-square)](https://github.com/vedangdhuri/Opti-Time-69/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/vedangdhuri/Opti-Time-69?style=flat-square)](https://github.com/vedangdhuri/Opti-Time-69/commits/main)
 
-### 1. High-Level Architecture
-The project is divided into three main applications:
-*   **`myapp`**: Handles User Authentication (Login, Signup), User Profile, Main Dashboard, and general feedback/chat features.
-*   **`class_timetable`** (Active): The core module for generating class-specific timetables (e.g., TYCO A, SYCO B) using a heuristic algorithm.
-*   **[timetable](cci:1://file:///d:/PROGRAMMING/Main/made_with_anti/timetable/views.py:8:0-95:68)**: A more generalized model-driven approach (likely an earlier version or alternative implementation).
+**A robust, randomized heuristic-based system for automated academic scheduling.**
 
----
+[Features](#-key-features) • [Tech Stack](#-tech-stack) • [Algorithm](#-algorithm-logic) • [Installation](#-installation--setup) • [Research](#-research--references)
 
-### 2. The Core Workflow (User Journey)
-
-
-#### **Step 1: Dashboard & Navigation**
-*   **User Action:** detailed in [myapp/views.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/myapp/views.py:0:0-0:0).
-*   Users log in and land on the main **Dashboard** (`/dashboard/`).
-*   From there, they navigate to the **Class Timetable Dashboard** (`/class-timetable/`) to select a specific class (e.g., "Third Year Computer - Div A").
-
-#### **Step 2: Input Data Configuration**
-*   **User Action:** Inputs subject and teacher constraints.
-*   **Process:**
-    *   The user selects a class (e.g., `tyco_a`).
-    *   The system loads the specific input form (e.g., `TycoAInputForm`) defined in [class_timetable/forms.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/forms.py:0:0-0:0).
-    *   **Data Points:**
-        *   **Teacher Name**
-        *   **Subject Name**
-        *   **Theory Credits:** Determines the number of 1-hour lectures.
-        *   **Practical Credits:** Determines the number of 2-hour lab blocks.
-
-#### **Step 3: Timetable Generation ( The "Magic" )**
-*   **User Action:** Clicks the "Generate" button.
-*   **Code Reference:** [class_timetable/utils.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/utils.py:0:0-0:0) -> [generate_timetable_for_class(class_key)](cci:1://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/utils.py:65:0-348:28).
-*   **Algorithm Logic:**
-    1.  **Clear Schedule:** Deletes any existing entries for that class.
-    2.  **Process Requests:** Expands user inputs into "Theory Slots" (1hr) and "Practical Blocks" (2hrs/week).
-    3.  **Phase A - Practicals (Hard Constraint):**
-        *   Creates pools for batches (A1, A2, A3).
-        *   Uses a **Randomized Greedy Approach** to find valid "trios" of teachers for the 3 batches that don't violate external constraints (e.g., checking if a teacher is busy in TYCO B while scheduling TYCO A).
-        *   Places these trios in 2-hour blocks (e.g., 10-12, 12:45-2:45).
-    4.  **Phase B - Theory:**
-        *   Fills the remaining 1-hour slots with theory lectures.
-        *   Enforces a limit of **max 2 lectures per subject per day**.
-    5.  **Phase C - Fillers:**
-        *   Fills generic empty slots with "Extra" lectures or "Library" to ensure no gaps.
-    6.  **Save:** Commits the generated schedule to the class-specific Timetable model (e.g., `TycoATimetable`).
-
-#### **Step 4: Viewing & Exporting**
-*   **User Action:** User is redirected to the View page (`/class-timetable/view/tyco_a/`).
-*   **Display Logic:** [class_timetable/views.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/views.py:0:0-0:0) prepares the data grid.
-    *   It intelligently **merges cells** (rowspan) for 2-hour practical blocks so they appear as a single block in the UI.
-    *   It handles formatting (Breakfast/Lunch breaks are hardcoded strings in the view).
-*   **Export:** (As per recent tasks) The user can download this view as PNG, PDF, or Excel.
+</div>
 
 ---
 
-### 3. Key Files Structure
+## 📖 About The Project
 
-| File Path | Purpose |
-| :--- | :--- |
-| **[class_timetable/utils.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/utils.py:0:0-0:0)** | **Critical.** Contains the [generate_timetable_for_class](cci:1://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/utils.py:65:0-348:28) function and the entire scheduling algorithm (conflict checking, batch processing). |
-| **[class_timetable/views.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/views.py:0:0-0:0)** | Handles the UI logic: Input forms, Triggering generation, and Rendering the final grid with cell merging. |
-| **[class_timetable/models.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/class_timetable/models.py:0:0-0:0)** | Defines the specific tables for each class (e.g., `TycoAInput`, `TycoATimetable`) that store the configuration and results. |
-| **[myapp/urls.py](cci:7://file:///d:/PROGRAMMING/Main/made_with_anti/myapp/urls.py:0:0-0:0)** | managing authentication and main dashboard routing. |
+**Opti-Time** is a powerful Django-based application engineered to solve the NP-hard problem of university timetabling. It automates the complex process of scheduling classes, practical batches, and teacher assignments while strictly adhering to hard constraints and optimizing for soft constraints.
+
+It handles multiple classes (e.g., FYCO, SYCO, TYCO), subject constraints, practical batches (A1, A2, A3), and teacher availability to produce **conflict-free, optimized schedules**.
+
+---
+
+## 🚀 Key Features
+
+| Feature                     | Description                                                                                                        |
+| :-------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| **🤖 Automated Scheduling** | Generates valid timetables for multiple classes simultaneously with a single click.                                |
+| **⚡ Conflict Detection**   | Real-time validation ensures no teacher or room is double-booked across different classes.                         |
+| **🧪 Batch Management**     | Automatically handles practical sessions for distinct batches (A1, A2, A3) ensuring unique teacher assignments.    |
+| **⚖️ Smart Allocation**     | Prioritizes practicals (2hr blocks), distributes theory lectures evenly (Max 2/day), and fills gaps intelligently. |
+| **📈 Global Analytics**     | Dedicated institutional-level dashboards to holistically view overall validations, workload, and conflicts.        |
+| **📊 Class Dashboard**      | Visualizes per-class workload distribution to identify underloaded or overloaded resources.                        |
+| **🔄 Dynamic Regeneration** | Seamlessly regenerate the timetable with a single click to explore and refine scheduling alternatives.             |
+| **📥 Export Ready**         | Download generated timetables in professional **PDF**, **Excel**, and **PNG** formats.                             |
+| **🌱 Data Seeding**         | Includes scripts to populate initial sample data for robust testing and demonstration.                             |
+
+---
+
+## 🛠️ Tech Stack
+
+This project uses a modern, robust technology stack:
+
+### Backend
+
+- ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) **Python 3.11+** - The core programming language.
+- ![Django](https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white) **Django** - The high-level web framework.
+- ![SQLite](https://img.shields.io/badge/SQLite-07405e?style=flat-square&logo=sqlite&logoColor=white) **SQLite** - Local development database.
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white) **PostgreSQL** - Production-ready database support via `dj_database_url`.
+- ![WhiteNoise](https://img.shields.io/badge/WhiteNoise-000000?style=flat-square&logo=python&logoColor=white) **WhiteNoise** - For efficient static file serving in production.
+
+### Frontend
+
+- ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML5** - Structuring the web pages.
+- ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) **CSS3** - Styling and layout.
+- ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) **JavaScript** - Dynamic interactivity.
+
+### Libraries & Tools
+
+- **`itertools` & `random`**: For combinatorics and randomized slot allocation.
+- **`reportlab`**: For generating PDF reports.
+- **`xlsxwriter`**: For Excel exports.
+
+---
+
+## 🧠 Algorithm Logic
+
+The core of **Opti-Time** operates on a **Constrained-Based Randomized Heuristic Algorithm**. It approaches the scheduling problem in distinct, logical phases:
+
+1.  **🧬 Phase 1: Practical Scheduling (Hard Constraint)**
+    - Uses `itertools.product` to generate valid combinations of practical subjects for batches (A1, A2, A3).
+    - **Constraint**: All three teachers in a combined practical slot _must_ be unique.
+    - **Cross-Check**: Verifies teacher availability against other classes (e.g., Is the teacher busy in TYCO while needed for SYCO?).
+
+2.  **🕗 Phase 2: Theory Scheduling**
+    - Iterates through available time slots.
+    - Selects subjects from a weighted pool.
+    - **Constraints**:
+      - **Teacher Availability**: Checks against all other generated timetables.
+      - **Daily Load**: Limits a subject to a maximum of 2 lectures per day.
+
+3.  **🔄 Phase 3: Gap Filling & Optimization**
+    - Scans for remaining empty slots.
+    - Assigns "Extra" lectures or "Library" slots if no teachers are available, ensuring a complete schedule.
+
+---
+
+## 📦 Installation & Setup
+
+Get the project running locally in just a few steps.
+
+### Prerequisites
+
+- Python 3.11 or higher
+- Git
+
+### Steps
+
+1.  **Clone the Repository**
+
+    ```bash
+    git clone https://github.com/vedangdhuri/Opti-Time-69.git
+    cd Opti-Time
+    ```
+
+2.  **Create a Virtual Environment**
+
+    ```bash
+    # Windows
+    python -m venv .venv
+    .venv\Scripts\activate
+
+    # macOS/Linux
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+3.  **Install Dependencies**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Database Setup**
+
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+5.  **Seed Sample Data (Optional)**
+    _Populate the database with initial data for testing:_
+
+    ```bash
+    python populate_fyco_real.py
+    python populate_syco_real.py
+    python populate_tyco_real.py
+    ```
+
+6.  **Run the Server**
+    ```bash
+    python manage.py runserver
+    ```
+    🎉 Open your browser and go to `http://127.0.0.1:8000/`
+
+---
+
+## 📂 Project Structure
+
+```bash
+Opti-Time/
+├── class_timetable/       # 🧠 Main scheduling logic & models
+│   ├── utils.py           # Core scheduling algorithm
+│   ├── views.py           # View controllers & analytics
+│   └── models.py          # Data models (Teachers, Subjects)
+├── templates/             # 🎨 HTML Templates
+├── static/                # 💅 CSS/JS assets
+├── populate_*.py          # 🌱 Data seeding scripts
+├── manage.py              # ⚙️ Django CLI utility
+└── requirements.txt       # 📦 Project dependencies
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+---
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
