@@ -1,5 +1,4 @@
 <div align="center">
-    
 # 🗓️ Opti-Time: Automated Class Timetable Generator
 
 [![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
