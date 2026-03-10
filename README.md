@@ -1,5 +1,4 @@
 <div align="center">
-
 # 🗓️ Opti-Time: Automated Class Timetable Generator
 
 [![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
@@ -13,7 +12,6 @@
 **A robust, randomized heuristic-based system for automated academic scheduling.**
 
 [Features](#-key-features) • [Tech Stack](#-tech-stack) • [Algorithm](#-algorithm-logic) • [Installation](#-installation--setup) • [Research](#-research--references)
-
 </div>
 
 ---
